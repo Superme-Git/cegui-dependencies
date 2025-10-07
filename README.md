@@ -35,6 +35,60 @@ say that these libs are *not* the original code - to guarantee you're using
 the original, umodified, code you should download your own copies of the
 original source and perform your own build.
 
+# Building for CEGUI 0.7.9 with Visual Studio 2015
+
+Although the default branch is aimed at CEGUI 1.0, you can still use this
+repository to produce dependency binaries that are compatible with the legacy
+CEGUI 0.7.9 release on Windows with Visual Studio 2015. The process is entirely
+source-based and does not require pre-built archives.
+
+1. **Checkout the correct branch** – clone this repository and switch to the
+   `v0-8` branch, which preserves the ABI used by the 0.x series of CEGUI:
+
+   ```bash
+   git clone https://github.com/cegui/cegui-dependencies.git
+   cd cegui-dependencies
+   git checkout v0-8
+   ```
+
+2. **Open the Visual Studio 2015 developer prompt** – launch the "VS2015
+   x86/x64 Native Tools Command Prompt" that matches the architecture you want
+   to build for.
+
+3. **Configure with CMake** – create an out-of-source build directory and run
+   CMake, pointing it to the checked-out sources. Visual Studio 2015 is
+   automatically detected when you use the generator `Visual Studio 14 2015`
+   (add `Win64` if you need 64-bit binaries):
+
+   ```bat
+   mkdir build-vs2015
+   cd build-vs2015
+   cmake -G "Visual Studio 14 2015" ..
+   :: for 64-bit builds use:
+   :: cmake -G "Visual Studio 14 2015 Win64" ..
+   ```
+
+   You can pass additional options (for example `-DCEGUI_USE_STATIC_STD_LIBS=ON`)
+   to match the runtime model you require.
+
+4. **Build the dependencies** – open the generated `cegui-dependencies.sln` in
+   Visual Studio 2015 and compile the desired configuration (Debug/Release).
+   You can also drive the build from the command line:
+
+   ```bat
+   cmake --build . --config Release
+   ```
+
+5. **Use the produced binaries** – after a successful build, libraries and DLLs
+   are staged under `dependencies/lib` and `dependencies/bin`. Copy these
+   directories into your CEGUI 0.7.9 project or adjust your linker and runtime
+   paths accordingly.
+
+Because GitHub-hosted runners no longer offer Visual Studio 2015 images, the
+project cannot publish ready-made VS2015 dependency packages via GitHub Actions
+alone. If you need continuous delivery, consider preparing a self-hosted runner
+with VS2015 installed and reuse the steps above in a workflow.
+
 # Cross-compiling
 
 CEGUI dependencies can be cross-compiled from Linux to Windows. In order to do that, you need to configure a cross-compile file and invoke that using CMake. An example of such file is the following:
